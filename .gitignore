@@ -5,3 +5,4 @@ models/yolov8n.pt
 /dataset/yolo_format
 .env
 *__pycache__
+/logs

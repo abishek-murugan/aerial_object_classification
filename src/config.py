@@ -4,13 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Ensure logs directory exists
+import os
+os.makedirs("logs", exist_ok=True)
+
 # Setup logging
 log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
 logging.basicConfig(
     level=getattr(logging, log_level),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("app.log"),
+        logging.FileHandler(os.path.join("logs", "app.log")),
         logging.StreamHandler()
     ]
 )
