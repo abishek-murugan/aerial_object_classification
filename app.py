@@ -1,5 +1,8 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
+import torch
+torch.cuda.is_available = lambda: False
+torch.cuda.device_count = lambda: 0
 import streamlit as st
 import tensorflow as tf
 import numpy as np
