@@ -154,7 +154,7 @@ def load_yolo_model():
     # In a real scenario, you'd load your fine-tuned Keras model here.
     # We fallback to a pretrained YOLOv8 preset for demonstration.
     return keras_cv.models.YOLOV8Detector.from_preset(
-        "yolo_v8_xs_pascalvoc", 
+        "yolo_v8_m_pascalvoc", 
         bounding_box_format="xyxy"
     ), False
 
