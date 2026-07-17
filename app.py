@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import cv2
-import keras_cv
+from ultralytics import YOLO
 import os
 import time
 from src.config import MODELS_DIR, RESULTS_DIR, CLASSES, IMG_SIZE, logger
@@ -149,14 +149,16 @@ def load_classification_model(model_type):
 @st.cache_resource
 def load_yolo_model():
     """
-    Loads Keras-CV YOLOv8 natively in TensorFlow.
+    Loads trained YOLOv8 model, or falls back to pretrained yolov8n.
     """
-    # In a real scenario, you'd load your fine-tuned Keras model here.
-    # We fallback to a pretrained YOLOv8 preset for demonstration.
-    return keras_cv.models.YOLOV8Detector.from_preset(
-        "yolo_v8_m_pascalvoc", 
-        bounding_box_format="xyxy"
-    ), False
+    trained_yolo = os.path.join(RESULTS_DIR, 'yolov8_results', 'weights', 'best.pt')
+    if os.path.exists(trained_yolo):
+        try:
+            return YOLO(trained_yolo), True
+        except Exception as e:
+            st.warning(f"Error loading trained YOLO model: {e}. Falling back to default YOLOv8.")
+            return YOLO('yolov8n.pt'), False
+    return YOLO('yolov8n.pt'), False
 
 def preprocess_image(image):
     """
@@ -193,7 +195,7 @@ with tab_inference:
     
     with col_cfg:
         st.subheader("Pipeline Settings")
-        task_mode = st.radio("Task Mode", ["Classification (Binary)", "Object Detection (TF YOLOv8)"])
+        task_mode = st.radio("Task Mode", ["Classification (Binary)", "Object Detection (YOLOv8)"])
         
         if task_mode == "Classification (Binary)":
             model_choice = st.selectbox(
@@ -208,7 +210,7 @@ with tab_inference:
             else:
                 st.info("💡 **MobileNetV2**: Leverage pre-trained features on ImageNet dataset, frozen base layers with custom dense head.")
         else:
-            st.info("⚡ **TF YOLOv8**: Native TensorFlow real-time object detection model designed to identify and localize both birds and drones in a single forward pass.")
+            st.info("⚡ **YOLOv8 Nano**: Real-time object detection model designed to identify and localize both birds and drones in a single forward pass.")
             
     with col_upload:
         st.subheader("Image Input Source")
@@ -257,48 +259,30 @@ with tab_inference:
                             st.error(f"⚠️ Model file for '{model_choice}' is not found. Please run the training pipeline in Tab 2 or CLI first.")
                 
                 else:
-                    with st.spinner("Executing TF YOLOv8 object detection..."):
+                    with st.spinner("Executing YOLOv8 object detection..."):
                         model, is_trained = load_yolo_model()
                         
                         if is_trained:
-                            st.sidebar.success("Loaded trained Custom TF YOLOv8 model.")
+                            st.sidebar.success("Loaded trained Custom YOLOv8 model.")
                         else:
-                            st.sidebar.warning("Using pre-trained TF YOLOv8 model.")
+                            st.sidebar.warning("Using pre-trained YOLOv8 model (trained on COCO).")
                             
                         # Run inference
                         start_time = time.time()
-                        img_tensor = tf.convert_to_tensor(image)
-                        if len(img_tensor.shape) == 3 and img_tensor.shape[2] == 4:
-                            img_tensor = img_tensor[:,:,:3] # drop alpha channel
-                        img_tensor = tf.cast(img_tensor, dtype=tf.float32)
-                        img_tensor = tf.expand_dims(img_tensor, axis=0)
-                        
-                        # Keras-CV YOLOv8 predict
-                        results = model.predict(img_tensor, verbose=0)
+                        results = model(image)
                         latency = (time.time() - start_time) * 1000
                         
-                        boxes = results["boxes"][0]
-                        classes = results["classes"][0]
-                        confidence = results["confidence"][0]
-                        
-                        res_plotted = np.array(image).copy()
-                        if res_plotted.shape[-1] == 4:
-                            res_plotted = res_plotted[:,:,:3]
-                        
-                        num_boxes = 0
-                        for i in range(len(confidence)):
-                            if confidence[i] > 0.3 and confidence[i] != -1:
-                                num_boxes += 1
-                                xmin, ymin, xmax, ymax = boxes[i]
-                                cv2.rectangle(res_plotted, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 0), 2)
+                        res_plotted = results[0].plot()
                         
                         # Save result image in a separate folder
                         os.makedirs("results", exist_ok=True)
                         result_path = f"results/detection_{int(time.time())}.jpg"
-                        Image.fromarray(res_plotted).save(result_path)
+                        Image.fromarray(res_plotted[:, :, ::-1]).save(result_path)
+                        
+                        num_boxes = len(results[0].boxes)
                         
                         st.markdown("### 🔍 Detection Output Map")
-                        st.image(res_plotted, caption=f"TF YOLOv8 Output (Saved to {result_path})", use_container_width=True)
+                        st.image(res_plotted, caption=f"YOLOv8 Output (Saved to {result_path})", use_container_width=True)
                         
                         # Show latency and detections
                         det_col1, det_col2 = st.columns(2)
@@ -337,8 +321,31 @@ with tab_diagnostics:
             st.warning(f"No confusion matrix plot found for {diag_model} at {cm_path}. Please run evaluate_classification first.")
 
     st.markdown("---")
-    st.subheader("Object Detection Diagnostics (TF YOLOv8)")
-    st.info("Using pre-trained TensorFlow/Keras-CV model. Custom training diagnostics are not yet available.")
+    st.subheader("Object Detection Diagnostics (YOLOv8)")
+    
+    yolo_results_dir = os.path.join(RESULTS_DIR, 'yolov8_results')
+    if os.path.exists(yolo_results_dir):
+        yolo_cols = st.columns(2)
+        
+        # Check for results plot
+        yolo_res_plot = os.path.join(yolo_results_dir, 'results.png')
+        with yolo_cols[0]:
+            st.markdown("##### YOLOv8 Training Trends")
+            if os.path.exists(yolo_res_plot):
+                st.image(yolo_res_plot, caption="YOLOv8 Loss & Metric Trends", use_container_width=True)
+            else:
+                st.info("YOLOv8 training results.png not found. Make sure training completed.")
+                
+        # Check for confusion matrix
+        yolo_cm_plot = os.path.join(yolo_results_dir, 'confusion_matrix.png')
+        with yolo_cols[1]:
+            st.markdown("##### YOLOv8 Confusion Matrix")
+            if os.path.exists(yolo_cm_plot):
+                st.image(yolo_cm_plot, caption="YOLOv8 Confusion Matrix", use_container_width=True)
+            else:
+                st.info("YOLOv8 confusion_matrix.png not found.")
+    else:
+        st.info("YOLOv8 training directory not created. Complete the YOLOv8 training step first.")
 
 # ==========================================
 # TAB 3: System Diagnostics & Design
