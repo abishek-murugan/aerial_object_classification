@@ -1,0 +1,15 @@
+opencv-python-headless
+tensorflow-cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+streamlit
+ultralytics
+gdown
+python-docx
+python-dotenv
