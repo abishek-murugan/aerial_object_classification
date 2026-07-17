@@ -3,6 +3,8 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import cv2
+if not hasattr(cv2, 'imshow'):
+    cv2.imshow = lambda *args, **kwargs: None
 from ultralytics import YOLO
 import os
 import time

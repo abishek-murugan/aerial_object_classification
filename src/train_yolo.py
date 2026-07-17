@@ -1,3 +1,6 @@
+import cv2
+if not hasattr(cv2, 'imshow'):
+    cv2.imshow = lambda *args, **kwargs: None
 from ultralytics import YOLO
 import os
 from src.config import MODELS_DIR, RESULTS_DIR, YOLO_DATA_DIR
