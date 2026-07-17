@@ -9,7 +9,7 @@ dependencies = [
     "keras-cv>=0.9.0",
     "matplotlib>=3.11.0",
     "numpy>=2.5.1",
-    "opencv-python>=5.0.0.93",
+    "opencv-python-headless<5.0",
     "pandas>=3.0.3",
     "python-docx>=1.2.0",
     "python-dotenv>=1.2.2",
@@ -18,4 +18,5 @@ dependencies = [
     "streamlit>=1.59.2",
     "tensorflow-cpu>=2.21.0",
     "tensorflow-hub>=0.16.1",
+    "ultralytics>=8.4.98",
 ]
