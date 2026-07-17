@@ -1,3 +1,5 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 import streamlit as st
 import tensorflow as tf
 import numpy as np

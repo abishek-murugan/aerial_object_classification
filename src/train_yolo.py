@@ -1,3 +1,5 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 import cv2
 if not hasattr(cv2, 'imshow'):
     cv2.imshow = lambda *args, **kwargs: None
