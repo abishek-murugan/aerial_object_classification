@@ -3,3 +3,5 @@
 /venv
 /dataset
 /object_detection_Dataset
+*.env
+*__pycache__
