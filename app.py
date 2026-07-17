@@ -396,25 +396,10 @@ with tab_insights:
     st.markdown("""
     The flow diagram below displays the end-to-end processing pipeline for AeroEye AI:
     """)
-    st.mermaid("""
-    graph TD
-        A[Input Image/Frame] --> B{Choose Pipeline Mode}
-        B -->|Binary Classification| C[Preprocess Image 224x224]
-        B -->|Object Detection| D[Preprocess Image 320x320/640x640]
-        
-        C --> E{Select Architecture}
-        E -->|Custom CNN| F[Features Extracted via Conv Blocks]
-        E -->|MobileNetV2| G[Features Extracted via Pretrained Base]
-        
-        F --> H[Binary Classification Head]
-        G --> H
-        H --> I[Output Category: Bird vs Drone + Confidence]
-        
-        D --> J[YOLOv8 Backbone + Neck]
-        J --> K[YOLOv8 Detection Head]
-        K --> L[Output Map: Bounding Boxes + Confidence]
-        
-        style I fill:#1a3322,stroke:#6BCB77,stroke-width:2px
-        style L fill:#13263a,stroke:#4D96FF,stroke-width:2px
-        style A fill:#2b203c,stroke:#FF6B6B,stroke-width:2px
+    st.markdown("""
+    ```text
+    [Input Image/Frame] 
+       ├──► Binary Classification (Custom CNN or MobileNetV2)
+       └──► Object Detection (TF YOLOv8)
+    ```
     """)
