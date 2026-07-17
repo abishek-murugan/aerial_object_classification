@@ -19,6 +19,8 @@ dependencies = [
     "tensorflow-cpu>=2.21.0",
     "tensorflow-hub>=0.16.1",
     "ultralytics>=8.4.98",
+    "torch",
+    "torchvision",
 ]
 
 [[tool.uv.index]]
