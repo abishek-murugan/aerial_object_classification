@@ -9,7 +9,7 @@ matplotlib
 seaborn
 scikit-learn
 streamlit
-ultralytics
+
 gdown
 python-docx
 python-dotenv

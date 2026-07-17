@@ -4,7 +4,7 @@ import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-from src.config import MODELS_DIR, CLASSES
+from src.config import MODELS_DIR, RESULTS_DIR, CLASSES
 from src.data_loader import get_data_generators
 
 def evaluate_model(model_type='custom'):
@@ -36,7 +36,7 @@ def evaluate_model(model_type='custom'):
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     
-    save_path = os.path.join(MODELS_DIR, f'{model_type}_confusion_matrix.png')
+    save_path = os.path.join(RESULTS_DIR, f'{model_type}_confusion_matrix.png')
     plt.savefig(save_path)
     plt.close()
     print(f"Confusion matrix saved to {save_path}")

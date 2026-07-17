@@ -42,7 +42,7 @@ A web application built using **Streamlit** provides an interactive, dark-themed
 ├── run_all.py                  # Orchestrator to run preprocessing, training, and evaluation
 ├── requirements.txt            # Project python dependencies
 ├── dataset/                    # Classification dataset
-├── object_detection_Dataset/   # YOLOv8 format object detection dataset
+├── dataset/yolo_format/   # YOLOv8 format object detection dataset
 ├── notebooks/                  # Interactive Jupyter Notebooks
 │   ├── Aerial_Object_Classification_using_Deep_Learning.ipynb
 │   └── Aerial_Object_Detection_Dataset_YOLOv8_Format.ipynb

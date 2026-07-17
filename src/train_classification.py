@@ -2,7 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from src.config import MODELS_DIR, EPOCHS
+from src.config import MODELS_DIR, RESULTS_DIR, EPOCHS
 from src.data_loader import get_data_generators
 from src.models import build_custom_cnn, build_transfer_model
 
@@ -30,7 +30,7 @@ def plot_history(history, model_name):
     plt.legend(loc='upper right')
     plt.title(f'{model_name} - Loss')
     
-    save_path = os.path.join(MODELS_DIR, f'{model_name}_history.png')
+    save_path = os.path.join(RESULTS_DIR, f'{model_name}_history.png')
     plt.savefig(save_path)
     plt.close()
     print(f"Training history plot saved to {save_path}")

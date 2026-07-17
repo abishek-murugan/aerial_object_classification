@@ -30,10 +30,7 @@ def main():
     run_module('src.evaluate_classification')
     
     # 3. Object Detection Dataset Formatting
-    run_module('src.prepare_yolo_dataset')
-    
-    # 4. YOLOv8 Model Fine-Tuning
-    run_module('src.train_yolo')
+    # (Removed YOLO training, relying on TF Hub)
     
     print("=" * 50)
     print("End-to-End Pipeline Execution Successful!")

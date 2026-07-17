@@ -1,7 +1,7 @@
 /models
-*yolov8n.pt
-/venv
+models/yolov8n.pt
+/.venv
 /dataset
-/object_detection_Dataset
+/dataset/yolo_format
 .env
 *__pycache__
